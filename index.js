@@ -10,11 +10,11 @@ const db = mysql.createConnection({
     user: "root",
     host: "localhost",
     password: "",
-    database: "LeafHerbSystem"
+    database: "lhsystem"
 })
 
-app.get('/leafherb', (req, res) => {
-    db.query("SELECT * FROM leafherb", (err, result) => {
+app.get('/herb', (req, res) => {
+    db.query("SELECT * FROM herb", (err, result) => {
         if (err) {
             console.log(err);
         } else {
@@ -24,17 +24,82 @@ app.get('/leafherb', (req, res) => {
 
 });
 
+app.get('/symptom', (req, res) => {
+    db.query("SELECT * FROM symptom", (err, result) => {
+        if (err) {
+            console.log(err);
+        } else {
+            res.send(result);
+        }
+    });
+
+});
+
+app.get('/detail/:id', (req, res) => {
+    var pageid = req.params.id;
+    // console.log(pageid);
+    var sql = "SELECT * FROM herb WHERE HID = " + pageid;
+    // console.log(sql);
+    var properties = "SELECT * FROM properties WHERE HID = " + pageid;
+    var research = "SELECT * FROM research WHERE HID = " + pageid;
+    // var chemical = "SELECT * FROM chemical WHERE HID = " + pageid;
+    db.query((sql), (err, result) => {
+        if (err) {
+            console.log(err);
+        } else {
+            // console.log("true");
+            res.send(result);
+        }
+    });
+});
+
+app.get('/addmore/', (req, res) => {
+    // var pageid = req.params.id;
+    // console.log(pageid);
+    // var sql = "SELECT HID FROM herb ORDER BY HID DESC";
+    // var sql = "SELECT MAX(HID,Sname) FROM herb ORDER BY HID DESC";
+    var sql = "SELECT * FROM herb WHERE HID=(SELECT max(HID) FROM herb);";
+        // console.log(sql);
+    db.query((sql), (err, result) => {
+        if (err) {
+            console.log(err);
+        } else {
+            // console.log("true");
+            res.send(result);
+        }
+    });
+});
+
 app.post('/create', (req, res) => {
+    const HID = req.body.HID;
     const SPname = req.body.SPname;
     const Cname = req.body.Cname;
     const Sname = req.body.Sname;
     const Family = req.body.Family;
-    const Characteristic = req.body.Characteristic;
-    const Ingredient = req.body.Ingredient;
-    const Img = req.body.Img;
+    const Pic = req.body.Pic;
+    const Root = req.body.Root;
+    const Stem = req.body.Stem;
+    const Leaf = req.body.Leaf;
+    const Flower = req.body.Flower;
+    const Fruit = req.body.Fruit;
+    const Seed = req.body.Seed;
 
-    db.query("INSERT INTO leafherb (SPname, Cname, Sname, Family, Characteristic, Ingredient, Img) VALUES(?,?,?,?,?,?,?)",
-        [SPname, Cname, Sname, Family, Characteristic, Ingredient, Img],
+    const UseID = req.body.UseID;
+    const SymID = req.body.SymID;
+    const Part = req.body.Part;
+    const How = req.body.How;
+
+    const Rname = req.body.Rname;
+    const Publish_years = req.body.Publish_years;
+    const Rlink = req.body.Rlink;
+    const Rdetail = req.body.Rdetail;
+
+    // const ChemID = req.body.ChemID;
+    // const Chem_name = req.body.Chem_name;
+    // const Chem_formular = req.body.Chem_formular;
+
+    db.query("INSERT INTO herb (SPname, Cname, Sname, Family, Pic, Root, Stem, Leaf, Flower, Fruit, Seed) VALUES(?,?,?,?,?,?,?,?,?,?,?)",
+        [SPname, Cname, Sname, Family, Pic, Root, Stem, Leaf, Flower, Fruit, Seed],
         (err, result) => {
             if (err) {
                 console.log(err);
@@ -42,12 +107,42 @@ app.post('/create', (req, res) => {
                 res.send("Values inserted");
             }
         });
+
+    db.query("INSERT INTO properties WHERE (UseID, SymID, Part, How) VALUES(?,?,?,?)",
+        [UseID, SymID, Part, How],
+        (err, result) => {
+            if (err) {
+                console.log(err);
+            } else {
+                res.send("Values inserted");
+            }
+        });
+
+    // db.query("INSERT INTO research (Rname, Publish_years, Rlink, Rdetail) VALUES(?,?,?,?)",
+    //     [Rname, Publish_years, Rlink, Rdetail],
+    //     (err, result) => {
+    //         if (err) {
+    //             console.log(err);
+    //         } else {
+    //             res.send("Values inserted");
+    //         }
+    //     });
+
+        // db.query("INSERT INTO chemical (ChemID, Chem_name, Chem_formular) VALUES(?,?,?)",
+        // [ChemID, Chem_name, Chem_formular],
+        // (err, result) => {
+        //     if (err) {
+        //         console.log(err);
+        //     } else {
+        //         res.send("Values inserted");
+        //     }
+        // });
 })
 
 app.put('/update', (req, res) => {
     const HID = req.body.HID;
     const SPname = req.body.SPname;
-    db.query("UPDATE leafherb SET SPname = ? WHERE HID = ?", [SPname, HID], (err, result) => {
+    db.query("UPDATE herb SET SPname = ? WHERE HID = ?", [SPname, HID], (err, result) => {
         if (err) {
             console.log(err);
         } else {
@@ -58,7 +153,7 @@ app.put('/update', (req, res) => {
 
 app.delete('/delete/:HID', (req, res) => {
     const HID = req.params.HID;
-    db.query("DELETE FROM leafherb WHERE HID =?", HID, (err, result) => {
+    db.query("DELETE FROM herb WHERE HID =?", HID, (err, result) => {
         if (err) {
             console.log(err);
         } else {
@@ -68,5 +163,5 @@ app.delete('/delete/:HID', (req, res) => {
 })
 
 app.listen('3001', () => {
-    console.log('Server is running on poet 3001');
+    console.log('Server is running on port 3001');
 })
