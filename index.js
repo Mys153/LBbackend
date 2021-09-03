@@ -84,7 +84,7 @@ app.post('/create', (req, res) => {
     const Fruit = req.body.Fruit;
     const Seed = req.body.Seed;
 
-    const UseID = req.body.UseID;
+    const Usetype = req.body.Usetype;
     const SymID = req.body.SymID;
     const Part = req.body.Part;
     const How = req.body.How;
@@ -108,8 +108,8 @@ app.post('/create', (req, res) => {
             }
         });
 
-    db.query("INSERT INTO properties WHERE (UseID, SymID, Part, How) VALUES(?,?,?,?)",
-        [UseID, SymID, Part, How],
+    db.query("INSERT INTO properties (HID, Usetype, SymID, Part, How) VALUES(?,?,?,?,?)",
+        [HID, Usetype, SymID, Part, How],
         (err, result) => {
             if (err) {
                 console.log(err);
@@ -142,7 +142,8 @@ app.post('/create', (req, res) => {
 app.put('/update', (req, res) => {
     const HID = req.body.HID;
     const SPname = req.body.SPname;
-    db.query("UPDATE herb SET SPname = ? WHERE HID = ?", [SPname, HID], (err, result) => {
+    const Cname = req.body.Cname;
+    db.query("UPDATE herb SET SPname = ?,  Cname = ? WHERE HID = ?", [SPname,Cname, HID], (err, result) => {
         if (err) {
             console.log(err);
         } else {
