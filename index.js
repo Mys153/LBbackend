@@ -35,6 +35,17 @@ app.get('/symptom', (req, res) => {
 
 });
 
+app.get('/family', (req, res) => {
+    db.query("SELECT DISTINCT Family FROM herb ORDER BY Family", (err, result) => {
+        if (err) {
+            console.log(err);
+        } else {
+            res.send(result);
+        }
+    });
+
+});
+
 app.get('/detail/:id', (req, res) => {
     var pageid = req.params.id;
     // console.log(pageid);
@@ -53,11 +64,21 @@ app.get('/detail/:id', (req, res) => {
     });
 });
 
-app.get('/addmore/', (req, res) => {
-    // var pageid = req.params.id;
+app.get('/symptom/:id', (req, res) => {
+    var pageid = req.params.id;
     // console.log(pageid);
-    // var sql = "SELECT HID FROM herb ORDER BY HID DESC";
-    // var sql = "SELECT MAX(HID,Sname) FROM herb ORDER BY HID DESC";
+    var sql = "SELECT How FROM properties WHERE HID = " + pageid;
+    db.query((sql), (err, result) => {
+        if (err) {
+            console.log(err);
+        } else {
+            // console.log("true");
+            res.send(result);
+        }
+    });
+});
+
+app.get('/addmore/', (req, res) => {
     var sql = "SELECT * FROM herb WHERE HID=(SELECT max(HID) FROM herb);";
         // console.log(sql);
     db.query((sql), (err, result) => {
@@ -84,19 +105,23 @@ app.post('/create', (req, res) => {
     const Fruit = req.body.Fruit;
     const Seed = req.body.Seed;
 
+    const Localname = req.body.Localname;
+    const Region = req.body.Region;
+   
     const Usetype = req.body.Usetype;
     const SymID = req.body.SymID;
     const Part = req.body.Part;
     const How = req.body.How;
 
+    const R_HID = req.body.HID;
     const Rname = req.body.Rname;
     const Publish_years = req.body.Publish_years;
     const Rlink = req.body.Rlink;
     const Rdetail = req.body.Rdetail;
 
-    // const ChemID = req.body.ChemID;
-    // const Chem_name = req.body.Chem_name;
-    // const Chem_formular = req.body.Chem_formular;
+    const ChemID = req.body.ChemID;
+    const Chem_name = req.body.Chem_name;
+    const Chem_formular = req.body.Chem_formular;
 
     db.query("INSERT INTO herb (SPname, Cname, Sname, Family, Pic, Root, Stem, Leaf, Flower, Fruit, Seed) VALUES(?,?,?,?,?,?,?,?,?,?,?)",
         [SPname, Cname, Sname, Family, Pic, Root, Stem, Leaf, Flower, Fruit, Seed],
@@ -118,15 +143,15 @@ app.post('/create', (req, res) => {
             }
         });
 
-    // db.query("INSERT INTO research (Rname, Publish_years, Rlink, Rdetail) VALUES(?,?,?,?)",
-    //     [Rname, Publish_years, Rlink, Rdetail],
-    //     (err, result) => {
-    //         if (err) {
-    //             console.log(err);
-    //         } else {
-    //             res.send("Values inserted");
-    //         }
-    //     });
+    db.query("INSERT INTO research (HID, Rname, Publish_years, Rlink, Rdetail) VALUES(?,?,?,?,?)",
+        [R_HID, Rname, Publish_years, Rlink, Rdetail],
+        (err, result) => {
+            if (err) {
+                console.log(err);
+            } else {
+                res.send("Values inserted");
+            }
+        });
 
         // db.query("INSERT INTO chemical (ChemID, Chem_name, Chem_formular) VALUES(?,?,?)",
         // [ChemID, Chem_name, Chem_formular],
