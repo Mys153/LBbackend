@@ -78,6 +78,34 @@ app.get('/symptom/:id', (req, res) => {
     });
 });
 
+app.get('/research/:id', (req, res) => {
+    var pageid = req.params.id;
+    // console.log(pageid);
+    var sql = "SELECT * FROM research WHERE HID = " + pageid;
+    db.query((sql), (err, result) => {
+        if (err) {
+            console.log(err);
+        } else {
+            // console.log("true");
+            res.send(result);
+        }
+    });
+});
+
+app.get('/chemical/:id', (req, res) => {
+    var pageid = req.params.id;
+    // console.log(pageid);
+    var sql = "SELECT * FROM chemical WHERE HID = " + pageid;
+    db.query((sql), (err, result) => {
+        if (err) {
+            console.log(err);
+        } else {
+            // console.log("true");
+            res.send(result);
+        }
+    });
+});
+
 app.get('/addmore/', (req, res) => {
     var sql = "SELECT * FROM herb WHERE HID=(SELECT max(HID) FROM herb);";
         // console.log(sql);
@@ -113,12 +141,13 @@ app.post('/create', (req, res) => {
     const Part = req.body.Part;
     const How = req.body.How;
 
-    const R_HID = req.body.HID;
+    const RHID = req.body.RHID;
     const Rname = req.body.Rname;
     const Publish_years = req.body.Publish_years;
     const Rlink = req.body.Rlink;
     const Rdetail = req.body.Rdetail;
 
+    const CHID = req.body.CHID;
     const ChemID = req.body.ChemID;
     const Chem_name = req.body.Chem_name;
     const Chem_formular = req.body.Chem_formular;
@@ -144,7 +173,7 @@ app.post('/create', (req, res) => {
         });
 
     db.query("INSERT INTO research (HID, Rname, Publish_years, Rlink, Rdetail) VALUES(?,?,?,?,?)",
-        [R_HID, Rname, Publish_years, Rlink, Rdetail],
+        [RHID, Rname, Publish_years, Rlink, Rdetail],
         (err, result) => {
             if (err) {
                 console.log(err);
@@ -153,15 +182,15 @@ app.post('/create', (req, res) => {
             }
         });
 
-        // db.query("INSERT INTO chemical (ChemID, Chem_name, Chem_formular) VALUES(?,?,?)",
-        // [ChemID, Chem_name, Chem_formular],
-        // (err, result) => {
-        //     if (err) {
-        //         console.log(err);
-        //     } else {
-        //         res.send("Values inserted");
-        //     }
-        // });
+        db.query("INSERT INTO chemical (HID, Chem_name, Chem_formular) VALUES(?,?,?)",
+        [CHID, Chem_name, Chem_formular],
+        (err, result) => {
+            if (err) {
+                console.log(err);
+            } else {
+                res.send("Values inserted");
+            }
+        });
 })
 
 app.put('/update', (req, res) => {
